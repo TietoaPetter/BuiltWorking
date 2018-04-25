@@ -115,7 +115,7 @@ gameInstance.Module.onRuntimeInitialized = function()
 	mc.on("hammer.input", function(ev) {
 		var pos = ValidatePosition(ev.center)
 		SendPosition(pos[0],pos[1]);
-		c_anyinput(ev.eventType); //Event type is simple the down, up, move... state of the Hammer messaging system
+		c_anyinput(ev.eventType); //Event type is simple down, up, move... state of the Hammer messaging system
 	});	
 	
 
