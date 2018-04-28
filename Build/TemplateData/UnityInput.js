@@ -113,6 +113,7 @@ gameInstance.Module.onRuntimeInitialized = function()
 	mc.get('pinch').recognizeWith('rotate');
 
 	mc.on("hammer.input", function(ev) {
+		setFullscreenIfMobile();
 		var pos = ValidatePosition(ev.center)
 		SendPosition(pos[0],pos[1]);
 		c_anyinput(ev.eventType); //Event type is simple the down, up, move... state of the Hammer messaging system
@@ -179,6 +180,14 @@ currTouchDiv = cnvas; //TODO: Check this
 fitCanvasToScreen();
 }
 
+function setFullscreenIfMobile(){
+	
+	if(UnityLoader.SystemInfo.mobile && !fullscreen)
+	{
+		gameInstance.Module.SetFullscreen(1);
+	}	
+}
+
 function fitCanvasToScreen(){
 	
 	if(cnvasParent.clientWidth > window.outerWidth)
@@ -229,7 +238,7 @@ function resizeInit()
 	screen.orientation.lock('any'); //Can only be set if in fullscreen mode. Hence only run when going out of fullscreen
 	if (initialized)
 	{
-		setTimeout(resize,750); 
+		setTimeout(resize,999); 
 	}
 }
 function resize()
