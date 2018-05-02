@@ -58,11 +58,13 @@ gameInstance.Module.onRuntimeInitialized = function()
 
 	initialized = true;
 	
-	//TODO: Send browser info to Unity via a Json object if necessary
+	//TODO: Send UnityLoader.SystemInfo to Unity via a Json object if necessary
 	
 	c_setfullscreenstate = gameInstance.Module.cwrap('call_cb_changedfullscreenstate',null,['number']);
 
 	c_orientationchange = gameInstance.Module.cwrap('call_cb_orientationchange',null,[]);
+	
+	c_mobiledevice = gameInstance.Module.cwrap('call_cb_mobiledevice',null,[]);
 
 	c_anyinput = gameInstance.Module.cwrap('call_cb_anyinput',null,['number']);
 	c_toggledebugmode = gameInstance.Module.cwrap('call_cb_toggledebugmode',null,[]);
@@ -78,8 +80,7 @@ gameInstance.Module.onRuntimeInitialized = function()
 
 	c_pinchrotate = gameInstance.Module.cwrap('call_cb_pinchrotate',null,['number']);
 
-	c_startpinchrotate = gameInstance.Module.cwrap('call_cb_startpinchrotate', null, ['number']);
-	
+	c_startpinchrotate = gameInstance.Module.cwrap('call_cb_startpinchrotate', null, ['number']);	
 	
 	// New gesture recognizer
 	mc = new Hammer.Manager(currTouchDiv);
@@ -113,7 +114,11 @@ gameInstance.Module.onRuntimeInitialized = function()
 	mc.get('pinch').recognizeWith('rotate');
 
 	mc.on("hammer.input", function(ev) {
-		setFullscreenIfMobile();
+		if(ev.eventType == 1)
+		{
+			setFullscreenIfMobile();
+		}
+
 		var pos = ValidatePosition(ev.center)
 		SendPosition(pos[0],pos[1]);
 		c_anyinput(ev.eventType); //Event type is simple the down, up, move... state of the Hammer messaging system
@@ -165,7 +170,7 @@ gameInstance.Module.onRuntimeInitialized = function()
 	});
 
 	mc.on("pinchmove rotatemove", function(ev) {
-		SendPinchRotate(ev.scale,ev.rotation);
+		SendPinchRotate(ev.scale, ev.rotation);
 	});
 	
 };
@@ -182,10 +187,17 @@ fitCanvasToScreen();
 
 function setFullscreenIfMobile(){
 	
-	if(UnityLoader.SystemInfo.mobile && !fullscreen)
+	//Send mobile info to Unity
+	if(UnityLoader.SystemInfo.mobile)
 	{
-		gameInstance.Module.SetFullscreen(1);
-	}	
+		c_mobiledevice();
+		//Set fullscreen
+		if(!fullscreen)
+		{
+			gameInstance.Module.SetFullscreen(1);
+		}
+	}
+	
 }
 
 function fitCanvasToScreen(){
