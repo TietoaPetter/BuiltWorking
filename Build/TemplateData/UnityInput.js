@@ -6,6 +6,7 @@ var mc;
 var initialized = false;
 var fullscreen = false;
 var fakeLandscape = false;
+var originalPortraitMode = null;
 
 function SendPosition(x,y){
 	var dataPtr = gameInstance.Module._malloc(8);
@@ -191,6 +192,7 @@ function setFullscreenIfMobile(){
 	if(UnityLoader.SystemInfo.mobile)
 	{
 		c_mobiledevice();
+
 		//Set fullscreen
 		if(!fullscreen)
 		{
@@ -246,8 +248,12 @@ function ValidateDelta(x,y)
 window.addEventListener('resize', resizeInit);
 
 function resizeInit()
-{
-	screen.orientation.lock('any'); //Can only be set if in fullscreen mode. Hence only run when going out of fullscreen
+{	
+	if(!fullscreen)
+	{
+		screen.orientation.unlock();
+	}
+	
 	if (initialized)
 	{
 		setTimeout(resize,999); 
@@ -255,7 +261,6 @@ function resizeInit()
 }
 function resize()
 {	
-
 	fullscreen = (cnvas.clientHeight == window.outerHeight);
 
 	if(fullscreen && UnityLoader.SystemInfo.mobile && UnityLoader.SystemInfo.os != "iOS")
